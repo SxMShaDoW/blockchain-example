@@ -3,6 +3,7 @@ from ledger import Ledger
 import random
 from cryptohash import cryptohash
 
+
 class Miner(User):
     """
     A user that can mine on the blockchain
@@ -16,28 +17,37 @@ class Miner(User):
 
     def do_work(self, mining_reward):
         """ Mine a block if it is full and reward the miner """
-        if self._ledger.is_block_full():
-            self.create_new_block()
-            # reward the miner from the system pool as the first transaction on the new block
-            self._ledger.add_transaction('Anon', self.name(), mining_reward)
-    
+        try:
+            if self._ledger.is_block_full():
+                self.create_new_block()
+                # reward the miner from the system pool as the first transaction on the new block
+                self._ledger.add_transaction('Anon', self.name(), mining_reward)
+            else:
+                raise
+        except Exception as e:
+                logger.exception('Unable to determine if block is full')   
+
     def is_valid_block_chain(self):
         """
         Check all the headers of the blockchain to make sure it hasn't been tampered with
         """
         max_nonce_attempts = 1000000
         difficulty = 4
-        for i,transaction in enumerate(self._ledger.all_transactions):
-            if i == 0:
-                continue
-            current_block = transaction['hdr']
-            previous_block = self._ledger.all_transactions[i - 1]['hdr']
-            nonce, hash_hex = cryptohash(previous_block, max_nonce_attempts, difficulty)
-            if nonce != current_block['rand'] and hash_hex != current_block['previous_hash']:
-                print('Warning blockchain may be tampered')
-                break
+        for i, transaction in enumerate(self._ledger.all_transactions):
+            try:
+                if i == 0:
+                    continue
+                current_block = transaction['hdr']
+                previous_block = self._ledger.all_transactions[i - 1]['hdr']
+                nonce, hash_hex = cryptohash(previous_block, max_nonce_attempts, difficulty)
+                if nonce != current_block['rand'] and hash_hex != current_block['previous_hash']:
+                    print('Warning blockchain may be tampered')
+                    break
+                else:
+                    raise
+            except Exception as e:
+                logger.exception('Unable to determine if blackchain has been tampered with')
         return True
-
 
     def create_new_block(self):
         """ Create a new block """

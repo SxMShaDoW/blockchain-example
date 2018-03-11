@@ -1,9 +1,24 @@
-# Assignment 3 by Jake, Dorian, Brady
+# Assignment 3
 
-## Pre-req Python 3.6 or higher
+## Pre-reqs
 
-# Steps to create a report on current dataset
+* Python 3.6 or higher
+* Pip
+* `pip install pytest`
+* Optional `pip install pytest-cov`
+
+### Steps to create a report on current dataset
+
 `python report.py`
 
-# Steps to generate random transactions
+### Steps to generate random transactions
+
 `python export_results.py`
+
+### Running tests
+
+`pytest .`
+
+### Generating Code Coverage
+
+`pytest --cov=. .`
